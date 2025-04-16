@@ -1,0 +1,23 @@
+name: stripe
+version: 0.1.0
+
+authors:
+  - Jamie Gaskins <jgaskins@hey.com>
+
+targets:
+  select_webhooks:
+    main: examples/webhook.cr
+  all_webhooks:
+    main: examples/oops_all_webhooks.cr
+
+dependencies:
+  http_client:
+    github: jgaskins/http_client
+
+development_dependencies:
+  stripe:
+    path: .
+
+crystal: '>= 1.13.2'
+
+license: MIT
