@@ -28,6 +28,19 @@ stripe = Stripe::Client.new(api_key)
 stripe = Stripe::Client.new
 ```
 
+To create a `PaymentIntent`:
+
+```crystal
+payment_intent = stripe.payment_intents.create(
+  amount: 13_37, # $13.37
+  currency: :usd,
+  customer: user.stripe_customer_id,
+  confirm: true,
+)
+```
+
+See the [Stripe docs](https://docs.stripe.com/api/payment_intents/create) for details on what these options do.
+
 ## Contributing
 
 1. Fork it (<https://github.com/jgaskins/stripe/fork>)

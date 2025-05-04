@@ -2,6 +2,7 @@ require "./resource"
 require "./metadata"
 require "./customer"
 require "./payment_method"
+require "./automatic_payment_methods"
 
 struct Stripe::SetupIntent
   include Resource
@@ -48,17 +49,6 @@ struct Stripe::SetupIntent
     Abandoned
     Duplicate
     RequestedByCustomer
-  end
-
-  struct AutomaticPaymentMethods
-    include Resource
-    getter? enabled : Bool?
-    getter allow_redirects : AllowRedirects?
-
-    enum AllowRedirects
-      Always
-      Never
-    end
   end
 
   struct SetupError

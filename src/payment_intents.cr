@@ -39,6 +39,25 @@ module Stripe
       client.get "/v1/payment_intents?#{params}", as: List(PaymentIntent)
     end
 
+    def create(
+      amount : Int,
+      currency : Currency,
+      customer : String? = nil,
+      confirm : Bool? = nil,
+      payment_method : String? = nil,
+      automatic_payment_methods : AutomaticPaymentMethods? = nil,
+    ) : PaymentIntent
+      client.post "/v1/payment_intents",
+        form: {
+          amount:                    amount.to_s,
+          currency:                  currency,
+          confirm:                   confirm,
+          payment_method:            payment_method,
+          automatic_payment_methods: automatic_payment_methods,
+        },
+        as: PaymentIntent
+    end
+
     @[Flags]
     enum Expand
       PaymentMethod

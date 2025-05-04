@@ -1,9 +1,23 @@
 require "./spec_helper"
 
-require "../src/params_builder"
+require "stripe/params_builder"
+require "stripe/resource"
 
 private enum MyEnum
   FooBar
+end
+
+private struct Person
+  include Stripe::Resource
+
+  getter name : String
+  getter? bool_value : Bool
+
+  # This one won't be serialized into params
+  getter nil_value : String?
+
+  def initialize(@name, @bool_value)
+  end
 end
 
 describe Stripe::ParamsBuilder do
@@ -39,7 +53,7 @@ describe Stripe::ParamsBuilder do
 
     builder.add "one", ["1", "uno"]
 
-    builder.to_s.should eq "one[]=1&one[]=uno"
+    builder.to_s.should eq URI::Params{"one[]" => %w[1 uno]}.to_s
   end
 
   it "encodes a NamedTuple" do
@@ -54,18 +68,35 @@ describe Stripe::ParamsBuilder do
     builder.to_s.should eq "one=foo_bar"
   end
 
-  it "encodes nested NamedTuples with arrays" do
+  it "encodes complex params" do
     builder = Stripe::ParamsBuilder.from(
       omg: {
-        lol:  "wtf",
+        lol: "wtf",
+        # Test that we can encode arrays properly
         does: [
+          # Testing nested objects
           {it: "work"},
           {it: "blend"},
         ],
+        # Test that we can encode a Stripe::Resource
+        person: Person.new(
+          # Straightforward method, easy to test serialization for
+          name: "Jamie",
+          # The method name for this property ends in `?`, so this tests that
+          # we can serialize those
+          bool_value: true,
+        ),
       },
+      # Nested object
       subscription: {price: "asdf"},
     )
 
-    builder.to_s.should eq "omg[lol]=wtf&omg[does][][it]=work&omg[does][][it]=blend&subscription[price]=asdf"
+    URI::Params.parse(builder.to_s).should eq URI::Params{
+      "omg[lol]"                => "wtf",
+      "omg[does][][it]"         => %w[work blend],
+      "omg[person][name]"       => "Jamie",
+      "omg[person][bool_value]" => "true",
+      "subscription[price]"     => "asdf",
+    }
   end
 end

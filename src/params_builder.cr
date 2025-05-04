@@ -28,6 +28,10 @@ module Stripe
       self
     end
 
+    def add(key : String, value : Resource) : self
+      add_resource key, value
+    end
+
     def add(key : String, value : Enum) : self
       add key, value.to_s.underscore
     end
@@ -59,6 +63,18 @@ module Stripe
 
     def to_s(io) : Nil
       io << @buffer.to_s
+    end
+
+    # For adding arbitrary Stripe::Resource types without having to manually
+    # break them down into NamedTuples.
+    private def add_resource(key : String, value : T) : self forall T
+      {% begin %}
+        add key, {
+          {% for ivar in T.instance_vars %}
+            {{ivar}}: value.@{{ivar}},
+          {% end %}
+        }
+      {% end %}
     end
   end
 end

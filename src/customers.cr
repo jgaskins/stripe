@@ -35,24 +35,53 @@ module Stripe
       metadata = nil,
       balance : Int? = nil,
       source : String? = nil,
+      invoice_settings : Customer::InvoiceSettings? = nil,
       tax_exempt : TaxExemption? = nil,
     ) : Customer
       client.post "/v1/customers",
         form: {
-          name:        name,
-          email:       email,
-          description: description,
-          metadata:    metadata,
-          balance:     balance,
-          source:      source,
-          tax_exempt:  tax_exempt,
+          name:             name,
+          email:            email,
+          description:      description,
+          metadata:         metadata,
+          balance:          balance,
+          source:           source,
+          invoice_settings: invoice_settings,
+          tax_exempt:       tax_exempt,
+        },
+        as: Customer
+    end
+
+    def update(
+      customer : String | Customer,
+      name : String? = nil,
+      email : String? = nil,
+      description : String? = nil,
+      metadata = nil,
+      balance : Int? = nil,
+      source : String? = nil,
+      invoice_settings : Customer::InvoiceSettings? = nil,
+      tax_exempt : TaxExemption? = nil,
+    ) : Customer
+      customer = customer.id if customer.is_a? Customer
+
+      client.post "/v1/customers/#{customer}",
+        form: {
+          name:             name,
+          email:            email,
+          description:      description,
+          metadata:         metadata,
+          balance:          balance,
+          source:           source,
+          invoice_settings: invoice_settings,
+          tax_exempt:       tax_exempt,
         },
         as: Customer
     end
 
     # TODO: Add params
-    def payment_methods(*, customer_id : String, limit : Int? = 0, type : PaymentMethod::Type? = nil) : List(PaymentMethod)
-      client.get "/v1/customers/#{customer_id}/payment_methods",
+    def payment_methods(*, customer : String, limit : Int? = 0, type : PaymentMethod::Type? = nil) : List(PaymentMethod)
+      client.get "/v1/customers/#{customer}/payment_methods",
         form: {
           limit: limit.try(&.to_s),
           type:  type,

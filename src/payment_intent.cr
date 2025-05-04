@@ -3,6 +3,7 @@ require "./currency"
 require "./metadata"
 require "./address"
 require "./payment_method"
+require "./automatic_payment_methods"
 
 struct Stripe::PaymentIntent
   include Resource
@@ -18,18 +19,6 @@ struct Stripe::PaymentIntent
   # Settings to configure compatible payment methods from the Stripe Dashboard.
   # retrievable with publishable key
   getter automatic_payment_methods : AutomaticPaymentMethods?
-
-  struct AutomaticPaymentMethods
-    include Resource
-
-    getter allow_redirects : AllowRedirects?
-    getter? enabled : Bool
-
-    enum AllowRedirects
-      Always
-      Never
-    end
-  end
 
   # The client secret of this PaymentIntent. Used for client-side retrieval using a publishable key.
   # The client secret can be used to complete a payment from your frontend. It should not be stored, logged, or exposed to anyone other than the customer. Make sure that you have TLS enabled on any page that includes the client secret.
