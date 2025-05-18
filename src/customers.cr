@@ -17,7 +17,7 @@ module Stripe
 
     def search(query_data : NamedTuple | Hash)
       query = String.build do |str|
-        metadata.each_with_index 1 do |key, value, index|
+        query_data.each_with_index 1 do |key, value, index|
           if index > 1
             str << " AND "
           end
