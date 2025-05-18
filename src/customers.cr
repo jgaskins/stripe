@@ -15,16 +15,20 @@ module Stripe
       client.get "/v1/customers/#{id}", as: Customer
     end
 
-    def search(metadata : NamedTuple | Hash)
+    def search(query_data : NamedTuple | Hash)
       query = String.build do |str|
         metadata.each_with_index 1 do |key, value, index|
           if index > 1
             str << " AND "
           end
-          str << %{metadata["} << key << %{"]:"} << value << '"'
+          str << key << %{:"} << value.gsub('"', %{\\"}) << '"'
         end
       end
 
+      search query
+    end
+
+    def search(query : String)
       client.get "/v1/customers/search?#{URI::Params{"query" => query}}", as: List(Customer)
     end
 
