@@ -5,6 +5,10 @@ require "./customer"
 
 module Stripe
   API.define SetupIntents do
+    def retrieve(id : String) : SetupIntent
+      client.get "/v1/setup_intents/#{id}", as: SetupIntent
+    end
+
     def create(
       *,
       customer : String? = nil,
