@@ -5,6 +5,11 @@ require "./customer"
 
 module Stripe
   API.define PaymentMethods do
+    def retrieve(id : String)
+      client.get "/v1/payment_methods/#{id}",
+        as: PaymentMethod
+    end
+
     def create(
       *,
       type : PaymentMethod::Type,
