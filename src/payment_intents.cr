@@ -51,6 +51,7 @@ module Stripe
         form: {
           amount:                    amount.to_s,
           currency:                  currency,
+          customer:                  customer,
           confirm:                   confirm,
           payment_method:            payment_method,
           automatic_payment_methods: automatic_payment_methods,
