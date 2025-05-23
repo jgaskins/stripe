@@ -6,7 +6,7 @@ struct Stripe::AutomaticPaymentMethods
   getter? enabled : Bool?
   getter allow_redirects : AllowRedirects?
 
-  def initialize(*, @enabled, @allow_redirects)
+  def initialize(*, @enabled = nil, @allow_redirects = nil)
   end
 
   enum AllowRedirects
