@@ -27,7 +27,7 @@ module Stripe
         as: PaymentMethod
     end
 
-    def attach(payment_method : String, customer : String) : PaymentMethod
+    def attach(payment_method : String, customer : String | Customer) : PaymentMethod
       client.post "/v1/payment_methods/#{payment_method}/attach",
         form: {customer: customer},
         as: PaymentMethod
