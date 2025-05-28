@@ -28,6 +28,9 @@ module Stripe
     end
 
     def attach(payment_method : String, customer : String | Customer) : PaymentMethod
+      # This is the worst line of code ever written
+      customer = customer.id if customer.is_a? Customer
+
       client.post "/v1/payment_methods/#{payment_method}/attach",
         form: {customer: customer},
         as: PaymentMethod
