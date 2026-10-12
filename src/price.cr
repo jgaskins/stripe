@@ -4,12 +4,9 @@ require "./payment_method"
 
 struct Stripe::Price
   include Resource
-  include JSON::Serializable::Unmapped
 
-  getter id : String
   getter? active : Bool
   getter currency : Currency
-  getter metadata : Metadata
   getter nickname : String?
   getter product : String | Product
   getter recurring : Recurring
@@ -17,11 +14,8 @@ struct Stripe::Price
   getter unit_amount : Int64?
   getter object : String
   getter billing_scheme : BillingScheme
-  @[JSON::Field(converter: Time::EpochConverter)]
-  getter created : Time
   getter currency_options : Hash(String, CurrencyOptions)?
   getter custom_unit_amount : CustomUnitAmount?
-  getter? livemode : Bool = false
   getter lookup_key : String?
   getter tax_behavior : TaxBehavior
   getter tiers : Array(Tier)?
@@ -65,7 +59,7 @@ struct Stripe::Price
   end
 
   struct Recurring
-    include Resource
+    include JSON::Serializable
 
     getter aggregate_usage : AggregateUsage?
     getter interval : Interval
@@ -119,7 +113,7 @@ struct Stripe::Price
   end
 
   struct Tier
-    include Resource
+    include JSON::Serializable
 
     getter flat_amount : Int64?
     getter flat_amount_decimal : String?

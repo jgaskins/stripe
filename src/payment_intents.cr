@@ -46,6 +46,7 @@ module Stripe
       confirm : Bool? = nil,
       payment_method : String? = nil,
       automatic_payment_methods : AutomaticPaymentMethods? = nil,
+      metadata = nil,
     ) : PaymentIntent
       client.post "/v1/payment_intents",
         form: {
@@ -54,7 +55,8 @@ module Stripe
           customer:                  customer,
           confirm:                   confirm,
           payment_method:            payment_method,
-          automatic_payment_methods: automatic_payment_methods,
+          automatic_payment_methods: automatic_payment_methods.try(&.to_named_tuple),
+          metadata:                  metadata,
         },
         as: PaymentIntent
     end

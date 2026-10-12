@@ -8,7 +8,6 @@ struct Stripe::Plan
   getter amount : Int64?
   getter currency : Currency
   getter interval : Interval
-  getter metadata : Metadata = Metadata.new
   getter nickname : String?
   getter product : String?
   getter aggregate_usage : AggregateUsage?

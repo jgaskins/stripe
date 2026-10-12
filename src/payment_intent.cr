@@ -1,16 +1,12 @@
 require "./resource"
 require "./currency"
-require "./metadata"
 require "./address"
+require "./shipping"
 require "./payment_method"
 require "./automatic_payment_methods"
 
 struct Stripe::PaymentIntent
   include Resource
-
-  # Unique identifier for the object.
-  # retrievable with publishable key
-  getter id : String
 
   # Amount intended to be collected by this PaymentIntent. A positive integer representing how much to charge in the smallest currency unit (e.g., 100 cents to charge $1.00 or 100 to charge ¥100, a zero-decimal currency). The minimum amount is $0.50 US or equivalent in charge currency. The amount value supports up to eight digits (e.g., a value of 99999999 for a USD charge of $999,999.99).
   # retrievable with publishable key
@@ -50,9 +46,6 @@ struct Stripe::PaymentIntent
   # ID of the latest Charge object created by this PaymentIntent. This property is null until PaymentIntent confirmation is attempted.
   getter latest_charge : String?
 
-  # Set of key-value pairs that you can attach to an object. This can be useful for storing additional information about the object in a structured format. Learn more about storing information in metadata.
-  getter metadata : Metadata
-
   # If present, this property tells you what actions you need to take in order for your customer to fulfill a payment using the provided source.
   getter next_action : Hash(String, JSON::Any)?
 
@@ -81,7 +74,7 @@ struct Stripe::PaymentIntent
 
   # Shipping information for this PaymentIntent.
   # retrievable with publishable key
-  getter shipping : Address?
+  getter shipping : Shipping?
 
   # Text that appears on the customer’s statement as the statement descriptor for a non-card charge. This value overrides the account’s default statement descriptor. For information about requirements, including the 22-character limit, see the Statement Descriptor docs.
   # Setting this value for a card charge returns an error. For card charges, set the statement_descriptor_suffix instead.
@@ -138,10 +131,10 @@ struct Stripe::PaymentIntent
   # Provides industry-specific information about the amount.
   getter amount_details : AmountDetails?
 
-  Resource.define AmountDetails do
+  Resource.subresource AmountDetails do
     getter tip : Tip?
 
-    Resource.define Tip do
+    Resource.subresource Tip do
       getter amount : Int64?
     end
   end

@@ -1,14 +1,14 @@
 require "./spec_helper"
 
-require "stripe/params_builder"
-require "stripe/resource"
+require "../src/params_builder"
+require "../src/resource"
 
 private enum MyEnum
   FooBar
 end
 
 private struct Person
-  include Stripe::Resource
+  include JSON::Serializable
 
   getter name : String
   getter? bool_value : Bool

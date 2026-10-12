@@ -9,13 +9,11 @@ require "../tax_exemption"
 struct Stripe::Checkout::Session
   include Resource
 
-  getter id : String
   getter client_reference_id : String?
   getter currency : Currency
   getter customer : String?
   getter customer_email : String?
   getter line_items : List(LineItem)?
-  getter metadata : Metadata { Metadata.new }
   getter mode : Mode
   getter payment_intent : String?
   getter payment_status : PaymentStatus
@@ -34,8 +32,6 @@ struct Stripe::Checkout::Session
   getter client_secret : String?
   getter consent : Consent?
   getter consent_collection : ConsentCollection?
-  @[JSON::Field(converter: Time::EpochConverter)]
-  getter created : Time
   getter currency_conversion : CurrencyConversion?
   getter custom_fields : Array(CustomField)
   getter custom_text : CustomText
@@ -45,7 +41,6 @@ struct Stripe::Checkout::Session
   getter expires_at : Time
   getter invoice : String?
   getter invoice_creation : InvoiceCreation?
-  getter? livemode : Bool = false
   getter locale : String?
   getter payment_link : String?
   getter payment_method_collection : PaymentMethodCollection?

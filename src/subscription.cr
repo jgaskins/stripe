@@ -3,11 +3,11 @@ require "./currency"
 require "./list"
 require "./plan"
 require "./price"
+require "./metadata"
 
 struct Stripe::Subscription
   include Resource
 
-  getter id : String
   getter? cancel_at_period_end : Bool
   getter currency : Currency
   @[JSON::Field(converter: Time::EpochConverter)]
@@ -20,19 +20,15 @@ struct Stripe::Subscription
   getter items : List(Item)
   getter plan : Plan?
   getter latest_invoice : String?
-  getter metadata : Metadata
   getter pending_setup_intent : String?
   getter pending_update : JSON::Any
   getter status : Status
-  @[JSON::Field(converter: Time::EpochConverter)]
-  getter created : Time
   @[JSON::Field(converter: Time::EpochConverter)]
   getter ended_at : Time?
   getter collection_method : CollectionMethod
   getter days_until_due : Int64?
   getter default_source : String?
   getter discounts : Array(String)?
-  getter? livemode : Bool
   getter on_behalf_of : String?
   getter pause_collection : JSON::Any
   getter payment_settings : JSON::Any

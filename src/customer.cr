@@ -1,17 +1,14 @@
 require "./resource"
 require "./currency"
-require "./metadata"
 require "./address"
+require "./shipping"
 require "./tax_exemption"
 
 struct Stripe::Customer
   include Resource
 
-  getter id : String
   getter address : Address?
   getter balance : Int64
-  @[JSON::Field(converter: Time::EpochConverter)]
-  getter created : Time
   getter currency : Currency?
   getter default_source : String?
   getter? delinquent : Bool?
@@ -20,18 +17,18 @@ struct Stripe::Customer
   getter email : String?
   getter invoice_prefix : String?
   getter invoice_settings : InvoiceSettings
-  getter? livemode : Bool
-  getter metadata : Metadata
   getter name : String?
   getter next_invoice_sequence : Int64?
   getter phone : String?
   getter preferred_locales : Array(String)?
-  getter shipping : Address?
+  getter shipping : Shipping?
   getter sources : JSON::Any?
   getter tax_exempt : TaxExemption?
   getter test_clock : JSON::Any
 
-  define InvoiceSettings do
+  struct InvoiceSettings
+    include JSON::Serializable
+
     getter custom_fields : Array(CustomField)?
     getter default_payment_method : String?
     getter footer : String?
@@ -57,12 +54,16 @@ struct Stripe::Customer
       end
     end
 
-    define CustomField do
+    struct CustomField
+      include JSON::Serializable
+
       getter name : String
       getter value : String
     end
 
-    define RenderingOptions do
+    struct RenderingOptions
+      include JSON::Serializable
+
       getter amount_tax_display : String?
       getter template : String?
     end

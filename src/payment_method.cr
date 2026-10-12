@@ -6,34 +6,28 @@ require "./test_card"
 struct Stripe::PaymentMethod
   include Resource
 
-  getter id : String
   getter billing_details : BillingDetails
   getter customer : String | Customer | Nil
-  getter metadata : Metadata = Metadata.new
   getter type : Type
   getter object : String
   getter allow_redisplay : AllowRedisplay?
   getter card : Card?
-  @[JSON::Field(converter: Time::EpochConverter)]
-  getter created : Time
-  getter? livemode : Bool
 
-  define Card do
-    getter! brand : Brand
-    getter checks : Checks?
-    getter country : String?
-    getter display_brand : String?
-    getter exp_month : Int8
-    getter exp_year : Int16
-    getter number : String?
-    getter fingerprint : String?
-    getter! funding : Funding
-    getter generated_from : GeneratedFrom?
-    getter! last4 : String
-    getter! networks : JSON::Any
-    getter! three_d_secure_usage : JSON::Any
-    getter! wallet : JSON::Any
-
+  subresource Card,
+    brand : Brand?,
+    checks : Checks?,
+    country : String?,
+    display_brand : String?,
+    exp_month : Int8,
+    exp_year : Int16,
+    number : String?,
+    fingerprint : String?,
+    funding : Funding?,
+    generated_from : GeneratedFrom?,
+    last4 : String?,
+    networks : JSON::Any?,
+    three_d_secure_usage : JSON::Any?,
+    wallet : JSON::Any? do
     def initialize(
       *,
       @brand = nil,
@@ -55,12 +49,11 @@ struct Stripe::PaymentMethod
       @exp_year = exp_year.to_i16
     end
 
-    define GeneratedFrom do
-      getter charge : String?
-      getter payment_method_details : PaymentMethodDetails?
-      getter setup_attempt : String
-
-      define PaymentMethodDetails do
+    subresource GeneratedFrom,
+      charge : String?,
+      payment_method_details : PaymentMethodDetails?,
+      setup_attempt : String do
+      Resource.define PaymentMethodDetails do
         getter card_present : JSON::Any
         getter type : String
       end
@@ -73,11 +66,10 @@ struct Stripe::PaymentMethod
       Unknown
     end
 
-    define Checks do
-      getter address_line1_check : Check?
-      getter address_postal_code_check : Check?
-      getter cvc_check : Check?
-
+    subresource Checks,
+      address_line1_check : Check?,
+      address_postal_code_check : Check?,
+      cvc_check : Check? do
       enum Check
         Pass
         Fail
@@ -105,12 +97,11 @@ struct Stripe::PaymentMethod
     Unspecified
   end
 
-  Resource.define BillingDetails do
-    getter address : Address?
-    getter email : String?
-    getter name : String?
-    getter phone : String?
-  end
+  subresource BillingDetails,
+    address : Address?,
+    email : String?,
+    name : String?,
+    phone : String?
 
   enum Type
     # Pre-authorized debit payments are used to debit Canadian bank accounts through the Automated Clearing Settlement System (ACSS).
@@ -230,5 +221,4 @@ struct Stripe::PaymentMethod
     # Zip is a Buy now, pay later Payment Method
     Zip
   end
-
 end

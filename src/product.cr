@@ -1,20 +1,14 @@
 require "./resource"
-require "./metadata"
 
 struct Stripe::Product
   include Resource
 
-  getter id : String
   getter? active : Bool
   getter default_price : String?
   getter description : String?
-  getter metadata : Metadata
   getter name : String
   getter object : String
-  @[JSON::Field(converter: Time::EpochConverter)]
-  getter created : Time
   getter images : Array(String)
-  getter? livemode : Bool = false
   getter marketing_features : Array(MarketingFeature)
   getter package_dimensions : PackageDimensions?
   getter? shippable : Bool?

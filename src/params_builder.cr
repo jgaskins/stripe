@@ -28,7 +28,7 @@ module Stripe
       self
     end
 
-    def add(key : String, value : Resource) : self
+    def add(key : String, value : JSON::Serializable) : self
       add_resource key, value
     end
 
@@ -65,8 +65,8 @@ module Stripe
       io << @buffer.to_s
     end
 
-    # For adding arbitrary Stripe::Resource types without having to manually
-    # break them down into NamedTuples.
+    # For adding arbitrary JSON::Serializable types (including Stripe::Resource)
+    # without having to manually break them down into NamedTuples.
     private def add_resource(key : String, value : T) : self forall T
       {% begin %}
         add key, {

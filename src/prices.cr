@@ -10,7 +10,7 @@ module Stripe
       active : Bool? = nil,
       type : Price::Type? = nil,
       product : Product | String | Nil = nil,
-      expand : Expand? = nil
+      expand : Expand? = nil,
     ) : List(Price)
       if product.is_a? Product
         product = product.id

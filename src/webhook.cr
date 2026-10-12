@@ -65,7 +65,7 @@ abstract struct Stripe::Webhook
     end
   end
 
-  private def self.handle_request(request, webhook_secret : String, body : String, tolerance : Time::Span) : Nil
+  private def self.handle_request(request, webhook_secret : String, body : String, tolerance : Time::Span, &) : Nil
     if (signature_header = request.headers["Stripe-Signature"]?)
       return nil unless timestamp_match = signature_header.match(/t=(\d+)/)
 

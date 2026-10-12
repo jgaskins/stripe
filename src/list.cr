@@ -1,7 +1,7 @@
 require "./resource"
 
 struct Stripe::List(T)
-  include Resource
+  include JSON::Serializable
   include Enumerable(T)
 
   getter url : String

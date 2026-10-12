@@ -1,5 +1,4 @@
 require "./resource"
-require "./metadata"
 require "./customer"
 require "./payment_method"
 require "./automatic_payment_methods"
@@ -7,20 +6,15 @@ require "./automatic_payment_methods"
 struct Stripe::SetupIntent
   include Resource
 
-  getter id : String
   getter automatic_payment_methods : AutomaticPaymentMethods?
   getter client_secret : String?
   getter customer : String | Customer | Nil
   getter description : String?
   getter last_setup_error : SetupError?
-  getter metadata : Metadata
   getter next_action : NextAction?
   getter payment_method : String | PaymentMethod | Nil
   getter status : Status
   getter usage : Usage
-  getter? livemode : Bool
-  @[JSON::Field(converter: Time::EpochConverter)]
-  getter created : Time
   getter application : String?
   getter? attach_to_self : Bool?
   getter cancellation_reason : CancellationReason?

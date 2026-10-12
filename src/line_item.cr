@@ -1,8 +1,9 @@
 require "./resource"
 require "./currency"
+require "./metadata"
 
 struct Stripe::LineItem
-  include Resource
+  include JSON::Serializable
 
   getter quantity : Int64
   getter adjustable_quantity : AdjustableQuantity?
@@ -14,7 +15,7 @@ struct Stripe::LineItem
   end
 
   struct PriceData
-    include Resource
+    include JSON::Serializable
 
     getter currency : Currency
     getter product : String?
@@ -26,7 +27,7 @@ struct Stripe::LineItem
     end
 
     struct Recurring
-      include Resource
+      include JSON::Serializable
 
       getter interval : Price::Interval
       getter interval_count : Int64
@@ -37,7 +38,7 @@ struct Stripe::LineItem
   end
 
   struct ProductData
-    include Resource
+    include JSON::Serializable
 
     getter name : String
     getter description : String?
@@ -50,7 +51,7 @@ struct Stripe::LineItem
   end
 
   struct AdjustableQuantity
-    include Resource
+    include JSON::Serializable
 
     getter? enabled : Bool
     getter maximum : Int64?

@@ -1,7 +1,7 @@
 require "./resource"
 
 struct Stripe::Address
-  include Resource
+  include JSON::Serializable
 
   # City, district, suburb, town, or village.
   getter city : String?
@@ -20,4 +20,25 @@ struct Stripe::Address
 
   # State, county, province, or region.
   getter state : String?
+
+  def initialize(
+    @line1 = nil,
+    @line2 = nil,
+    @city = nil,
+    @state = nil,
+    @postal_code = nil,
+    @country = nil,
+  )
+  end
+
+  protected def to_named_tuple
+    {
+      line1:       line1,
+      line2:       line2,
+      city:        city,
+      state:       state,
+      postal_code: postal_code,
+      country:     country,
+    }
+  end
 end
