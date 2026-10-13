@@ -17,6 +17,7 @@ module Stripe
         cancel_url : URI | String | Nil = nil,
         mode : Session::Mode = :payment,
         line_items : Array(LineItem)? = nil,
+        idempotency_key : String? = nil,
       )
         client.post "/v1/checkout/sessions",
           form: {
@@ -31,6 +32,7 @@ module Stripe
               }
             end,
           },
+          idempotency_key: idempotency_key,
           as: Session
       end
 

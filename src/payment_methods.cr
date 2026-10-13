@@ -14,6 +14,7 @@ module Stripe
       *,
       type : PaymentMethod::Type,
       card : PaymentMethod::Card? = nil,
+      idempotency_key : String? = nil,
     ) : PaymentMethod
       client.post "/v1/payment_methods",
         form: {
@@ -24,15 +25,17 @@ module Stripe
             exp_year:  card.exp_year.to_s,
           },
         },
+        idempotency_key: idempotency_key,
         as: PaymentMethod
     end
 
-    def attach(payment_method : String, customer : String | Customer) : PaymentMethod
+    def attach(payment_method : String, customer : String | Customer, idempotency_key : String? = nil) : PaymentMethod
       # This is the worst line of code ever written
       customer = customer.id if customer.is_a? Customer
 
       client.post "/v1/payment_methods/#{payment_method}/attach",
         form: {customer: customer},
+        idempotency_key: idempotency_key,
         as: PaymentMethod
     end
   end

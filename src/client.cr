@@ -25,14 +25,27 @@ class Stripe::Client
   end
 
   {% for method in %w[get post patch delete] %}
-    def {{method.id}}(path : String, *, params : NamedTuple? = nil, as type : T.class) forall T
+    def {{method.id}}(
+      path : String,
+      *,
+      params : NamedTuple? = nil,
+      {% if method == "post" %}
+        idempotency_key : String? = nil,
+      {% end %}
+      as type : T.class,
+    ) forall T
       if params
         resource = "#{path}?#{ParamsBuilder.from(params).to_s}"
       else
         resource = path
       end
 
-      response = @http.{{method.id}}(resource)
+      headers = HTTP::Headers.new
+      {% if method == "post" %}
+        headers["Idempotency-Key"] = idempotency_key if idempotency_key
+      {% end %}
+
+      response = @http.{{method.id}}(resource, headers: headers)
       if response.success?
         T.from_json(response.body)
       else
@@ -40,8 +53,19 @@ class Stripe::Client
       end
     end
 
-    def {{method.id}}(path : String, *, form : NamedTuple, as type : T.class) forall T
+    def {{method.id}}(
+      path : String,
+      *,
+      form : NamedTuple,
+      {% if method == "post" %}
+        idempotency_key : String? = nil,
+      {% end %}
+      as type : T.class,
+    ) forall T
       headers = HTTP::Headers{"Content-Type" => "application/x-www-form-urlencoded"}
+      {% if method == "post" %}
+        headers["Idempotency-Key"] = idempotency_key if idempotency_key
+      {% end %}
       body = ParamsBuilder.from(form).to_s
 
       response = @http.{{method.id}}(path, headers: headers, body: body)

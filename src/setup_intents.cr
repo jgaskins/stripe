@@ -17,6 +17,7 @@ module Stripe
       payment_method : String? = nil,
       usage : SetupIntent::Usage? = nil,
       payment_method_types : Array(PaymentMethod::Type),
+      idempotency_key : String? = nil,
     ) : SetupIntent
       client.post "/v1/setup_intents",
         form: {
@@ -26,6 +27,7 @@ module Stripe
           payment_method:       payment_method,
           payment_method_types: payment_method_types.map { |type| to_param(type) },
         },
+        idempotency_key: idempotency_key,
         as: SetupIntent
     end
   end

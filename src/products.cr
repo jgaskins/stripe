@@ -19,6 +19,7 @@ module Stripe
       active : Bool? = nil,
       description : String? = nil,
       unit_label : String? = nil,
+      idempotency_key : String? = nil,
     )
       client.post "/v1/products",
         form: {
@@ -27,6 +28,7 @@ module Stripe
           description: description,
           unit_label:  unit_label,
         },
+        idempotency_key: idempotency_key,
         as: Product
     end
 
@@ -34,12 +36,14 @@ module Stripe
       product : Product | String,
       *,
       active : Bool? = nil,
+      idempotency_key : String? = nil,
     ) : Product
       product = product.id if product.is_a? Product
       client.post "/v1/products/#{product}",
         form: {
           active: active,
         },
+        idempotency_key: idempotency_key,
         as: Product
     end
 

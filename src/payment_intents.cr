@@ -47,6 +47,7 @@ module Stripe
       payment_method : String? = nil,
       automatic_payment_methods : AutomaticPaymentMethods? = nil,
       metadata = nil,
+      idempotency_key : String? = nil,
     ) : PaymentIntent
       client.post "/v1/payment_intents",
         form: {
@@ -58,6 +59,7 @@ module Stripe
           automatic_payment_methods: automatic_payment_methods.try(&.to_named_tuple),
           metadata:                  metadata,
         },
+        idempotency_key: idempotency_key,
         as: PaymentIntent
     end
 

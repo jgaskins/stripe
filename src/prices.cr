@@ -38,6 +38,7 @@ module Stripe
       billing_scheme : Price::BillingScheme,
       tiers_mode : Price::TiersMode? = nil,
       tiers : Array? = nil,
+      idempotency_key : String? = nil,
     )
       case product
       in String
@@ -70,6 +71,7 @@ module Stripe
             }
           },
         },
+        idempotency_key: idempotency_key,
         as: Price
     end
 
@@ -77,6 +79,7 @@ module Stripe
       price : Price | String,
       *,
       active : Bool? = nil,
+      idempotency_key : String? = nil,
     ) : Price
       price = price.id if price.is_a? Price
 
@@ -84,6 +87,7 @@ module Stripe
         form: {
           active: active,
         },
+        idempotency_key: idempotency_key,
         as: Price
     end
 

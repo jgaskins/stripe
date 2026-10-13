@@ -41,6 +41,22 @@ payment_intent = stripe.payment_intents.create(
 
 See the [Stripe docs](https://docs.stripe.com/api/payment_intents/create) for details on what these options do.
 
+### Idempotent requests
+
+Any method that issues a `POST` request (`create`, `update`, `attach`, etc.) accepts an `idempotency_key` argument, which is sent as the `Idempotency-Key` header. Stripe will return the same result for retries of a request that uses the same key, so you can safely retry after a network failure without, for example, charging a customer twice.
+
+```crystal
+payment_intent = stripe.payment_intents.create(
+  amount: 13_37,
+  currency: :usd,
+  customer: user.stripe_customer_id,
+  confirm: true,
+  idempotency_key: "order-#{order.id}",
+)
+```
+
+See the [Stripe docs](https://docs.stripe.com/api/idempotent_requests) for details.
+
 ## Contributing
 
 1. Fork it (<https://github.com/jgaskins/stripe/fork>)

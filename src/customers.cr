@@ -49,6 +49,7 @@ module Stripe
       delinquent : Bool? = nil,
       preferred_locales : Array(String)? = nil,
       shipping : Shipping? = nil,
+      idempotency_key : String? = nil,
     ) : Customer
       client.post "/v1/customers",
         form: {
@@ -69,6 +70,7 @@ module Stripe
           preferred_locales: preferred_locales,
           shipping:          shipping.try(&.to_named_tuple),
         },
+        idempotency_key: idempotency_key,
         as: Customer
     end
 
@@ -90,6 +92,7 @@ module Stripe
       delinquent : Bool? = nil,
       preferred_locales : Array(String)? = nil,
       shipping : Shipping? = nil,
+      idempotency_key : String? = nil,
     ) : Customer
       customer = customer.id if customer.is_a? Customer
 
@@ -112,6 +115,7 @@ module Stripe
           preferred_locales: preferred_locales,
           shipping:          shipping.try(&.to_named_tuple),
         },
+        idempotency_key: idempotency_key,
         as: Customer
     end
 
