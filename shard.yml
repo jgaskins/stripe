@@ -11,8 +11,8 @@ targets:
     main: examples/oops_all_webhooks.cr
 
 dependencies:
-  http_client:
-    github: jgaskins/http_client
+  db:
+    github: crystal-lang/crystal-db
 
 development_dependencies:
   stripe:

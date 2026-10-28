@@ -2,6 +2,7 @@ require "./resource"
 require "./currency"
 require "./address"
 require "./shipping"
+require "./subscription"
 require "./tax_exemption"
 
 struct Stripe::Customer
@@ -23,6 +24,7 @@ struct Stripe::Customer
   getter preferred_locales : Array(String)?
   getter shipping : Shipping?
   getter sources : JSON::Any?
+  getter subscriptions : List(Subscription)?
   getter tax_exempt : TaxExemption?
   getter test_clock : JSON::Any
 

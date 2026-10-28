@@ -68,6 +68,19 @@ describe Stripe::ParamsBuilder do
     builder.to_s.should eq "one=foo_bar"
   end
 
+  it "encodes a timestamp"do
+    builder = Stripe::ParamsBuilder.from(created: Time.utc(
+      year: 2026,
+      month: 10,
+      day: 27,
+      hour: 12,
+      minute: 34,
+      second: 56,
+    ))
+
+    builder.to_s.should eq "created=1793104496"
+  end
+
   it "encodes complex params" do
     builder = Stripe::ParamsBuilder.from(
       omg: {

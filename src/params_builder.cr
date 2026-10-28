@@ -40,6 +40,10 @@ module Stripe
       add key, value.to_s
     end
 
+    def add(key : String, value : Time) : self
+      add key, value.to_unix.to_s
+    end
+
     def add(key : String, value : String) : self
       if written_first?
         @buffer << '&'

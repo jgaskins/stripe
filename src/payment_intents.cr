@@ -63,29 +63,11 @@ module Stripe
         as: PaymentIntent
     end
 
-    @[Flags]
-    enum Expand
+    def_expand do
+      Customer
+      LatestCharge
       PaymentMethod
-      PaymentMethodCustomer
-
-      def to_param(prefix) : String
-        if prefix
-          "#{prefix}.#{to_s}"
-        else
-          to_s
-        end
-      end
-
-      def to_s
-        case self
-        when .payment_method?
-          "payment_method"
-        when .payment_method_customer?
-          "payment_method.customer"
-        else
-          raise "BUG: THIS SHOULD NEVER HAPPEN"
-        end
-      end
+      Review
     end
   end
 end

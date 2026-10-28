@@ -27,7 +27,10 @@ end
 describe Stripe::Client do
   it "sends the Idempotency-Key header on POST requests" do
     with_server do |stripe, requests|
-      stripe.post "/v1/products", form: {name: "Foo"}, idempotency_key: "my-key", as: IDResponse
+      stripe.post "/v1/products",
+        form: {name: "Foo"},
+        idempotency_key: "my-key",
+        as: IDResponse
 
       requests.receive.headers["Idempotency-Key"].should eq "my-key"
     end
@@ -35,7 +38,9 @@ describe Stripe::Client do
 
   it "omits the Idempotency-Key header when no key is given" do
     with_server do |stripe, requests|
-      stripe.post "/v1/products", form: {name: "Foo"}, as: IDResponse
+      stripe.post "/v1/products",
+        form: {name: "Foo"},
+        as: IDResponse
 
       requests.receive.headers.has_key?("Idempotency-Key").should be_false
     end

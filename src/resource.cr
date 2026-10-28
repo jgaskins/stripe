@@ -9,7 +9,7 @@ module Stripe::Resource
 
   getter id : String
   getter metadata : Stripe::Metadata { Stripe::Metadata.new }
-  getter? livemode : Bool
+  getter? livemode : Bool?
   @[JSON::Field(converter: Time::EpochConverter)]
   getter created : Time
 
