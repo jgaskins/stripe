@@ -2,6 +2,10 @@ require "./api"
 require "./list"
 require "./payment_intent"
 require "./customer"
+require "./time_range"
+require "./customers"
+require "./charges"
+require "./payment_methods"
 
 module Stripe
   API.define PaymentIntents do
@@ -11,32 +15,20 @@ module Stripe
       starting_after : String? = nil,
       ending_before : String? = nil,
       limit : Int? = nil,
-      expand : Expand? = nil,
+      expand : Expansions? = nil,
     ) : List(PaymentIntent)
-      params = URI::Params.new
-      case customer
-      in Nil
-      in Customer
-        params["customer"] = customer.id
-      in String
-        params["customer"] = customer
-      end
-      if created
-        if earliest = created.begin
-          params["customer.gte"] = earliest.to_unix.to_s
-        end
-        if latest = created.end
-          params["customer.lt#{'e' if created.exclusive_end?}"] = latest.to_unix.to_s
-        end
-      end
-      params["starting_after"] = starting_after if starting_after
-      params["ending_before"] = ending_before if ending_before
-      params["limit"] = limit.to_s if limit
-      expand.try &.each do |value|
-        params.add "expand[]", value.to_param(:data)
-      end
+      customer = customer.id if customer.is_a? Customer
 
-      client.get "/v1/payment_intents?#{params}", as: List(PaymentIntent)
+      client.get "/v1/payment_intents",
+        params: {
+          customer:       customer,
+          created:        created.try { |range| TimeRange.new(range) },
+          starting_after: starting_after,
+          ending_before:  ending_before,
+          limit:          limit.try(&.to_s),
+          expand:         format_expand("data", expand),
+        },
+        as: List(PaymentIntent)
     end
 
     def create(
@@ -48,6 +40,7 @@ module Stripe
       automatic_payment_methods : AutomaticPaymentMethods? = nil,
       metadata = nil,
       idempotency_key : String? = nil,
+      expand : Expansions? = nil,
     ) : PaymentIntent
       client.post "/v1/payment_intents",
         form: {
@@ -58,6 +51,7 @@ module Stripe
           payment_method:            payment_method,
           automatic_payment_methods: automatic_payment_methods.try(&.to_named_tuple),
           metadata:                  metadata,
+          expand:                    format_expand(nil, expand),
         },
         idempotency_key: idempotency_key,
         as: PaymentIntent
@@ -68,6 +62,24 @@ module Stripe
       LatestCharge
       PaymentMethod
       Review
+    end
+
+    alias Expansions = Union(
+      Expand,
+      Array(Expand | Customers::Expand | Charges::Expand | PaymentMethods::Expand),
+      Array(String),
+    )
+
+    private def format_expand_item(prefix : String?, expand : Customers::Expand)
+      expand.to_params format_expand_item(prefix, "customer")
+    end
+
+    private def format_expand_item(prefix : String?, expand : Charges::Expand)
+      expand.to_params format_expand_item(prefix, "latest_charge")
+    end
+
+    private def format_expand_item(prefix : String?, expand : PaymentMethods::Expand)
+      expand.to_params format_expand_item(prefix, "payment_method")
     end
   end
 end

@@ -3,11 +3,12 @@ require "./currency"
 require "./customer"
 require "./list"
 require "./metadata"
+require "./payment_intent"
 require "./payment_method_details"
 require "./refund"
 require "./shipping"
 
-struct Stripe::Charge
+class Stripe::Charge
   include Resource
 
   getter amount : Int64
@@ -17,7 +18,7 @@ struct Stripe::Charge
   getter customer : String | Customer | Nil
   getter description : String?
   getter? disputed : Bool
-  getter payment_intent : String?
+  getter payment_intent : String | PaymentIntent | Nil
   getter payment_method_details : PaymentMethodDetails?
   getter receipt_email : String?
   getter? refunded : Bool

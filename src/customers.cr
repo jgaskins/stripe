@@ -7,15 +7,19 @@ require "./payment_method"
 module Stripe
   API.define Customers do
     # TODO: Add params
-    def list
-      client.get "/v1/customers", as: List(Customer)
+    def list(*, expand : Expansions? = nil)
+      client.get "/v1/customers",
+        params: {expand: format_expand("data", expand)},
+        as: List(Customer)
     end
 
-    def retrieve(id : String)
-      client.get "/v1/customers/#{id}", as: Customer
+    def retrieve(id : String, *, expand : Expansions? = nil)
+      client.get "/v1/customers/#{id}",
+        params: {expand: format_expand(nil, expand)},
+        as: Customer
     end
 
-    def search(query_data : NamedTuple | Hash)
+    def search(query_data : NamedTuple | Hash, *, expand : Expansions? = nil)
       query = String.build do |str|
         query_data.each_with_index 1 do |key, value, index|
           if index > 1
@@ -25,11 +29,16 @@ module Stripe
         end
       end
 
-      search query
+      search query, expand: expand
     end
 
-    def search(query : String)
-      client.get "/v1/customers/search?#{URI::Params{"query" => query}}", as: List(Customer)
+    def search(query : String, *, expand : Expansions? = nil)
+      client.get "/v1/customers/search",
+        params: {
+          query:  query,
+          expand: format_expand("data", expand),
+        },
+        as: List(Customer)
     end
 
     def create(
@@ -50,6 +59,7 @@ module Stripe
       preferred_locales : Array(String)? = nil,
       shipping : Shipping? = nil,
       idempotency_key : String? = nil,
+      expand : Expansions? = nil,
     ) : Customer
       client.post "/v1/customers",
         form: {
@@ -69,6 +79,7 @@ module Stripe
           delinquent:        delinquent,
           preferred_locales: preferred_locales,
           shipping:          shipping.try(&.to_named_tuple),
+          expand:            format_expand(nil, expand),
         },
         idempotency_key: idempotency_key,
         as: Customer
@@ -93,6 +104,7 @@ module Stripe
       preferred_locales : Array(String)? = nil,
       shipping : Shipping? = nil,
       idempotency_key : String? = nil,
+      expand : Expansions? = nil,
     ) : Customer
       customer = customer.id if customer.is_a? Customer
 
@@ -114,6 +126,7 @@ module Stripe
           delinquent:        delinquent,
           preferred_locales: preferred_locales,
           shipping:          shipping.try(&.to_named_tuple),
+          expand:            format_expand(nil, expand),
         },
         idempotency_key: idempotency_key,
         as: Customer
@@ -128,5 +141,17 @@ module Stripe
         },
         as: List(PaymentMethod)
     end
+
+    def_expand do
+      Sources
+      Subscriptions
+      TestClock
+    end
+
+    alias Expansions = Union(
+      Expand,
+      Array(Expand),
+      Array(String),
+    )
   end
 end

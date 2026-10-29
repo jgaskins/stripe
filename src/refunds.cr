@@ -1,6 +1,8 @@
 require "./api"
 require "./refund"
 require "./time_range"
+require "./charges"
+require "./payment_intents"
 
 module Stripe
   API.define Refunds do
@@ -38,12 +40,7 @@ module Stripe
       payment_intent : String,
       amount : Int? = nil,
       metadata = nil,
-      expand : Union(
-        Expand,
-        Array(Expand | Charges::Expand | PaymentIntents::Expand),
-        Array(String),
-        Nil,
-      ) = nil,
+      expand : Expansions? = nil,
     ) : Refund
       client.post "/v1/refunds",
         form: {
@@ -66,36 +63,12 @@ module Stripe
       Array(String),
     )
 
-    private def format_expand(prefix : String?, expand : Expand)
-      expand.to_params prefix
-    end
-
-    private def format_expand(prefix : String?, expand : Nil)
-      nil
-    end
-
-    private def format_expand(prefix : String?, expand : Array)
-      expand.flat_map { |item| format_expand_item prefix, item }
-    end
-
-    private def format_expand_item(prefix : String?, expand : Expand)
-      expand.to_params prefix
-    end
-
     private def format_expand_item(prefix : String?, expand : Charges::Expand)
       expand.to_params format_expand_item(prefix, "charge")
     end
 
     private def format_expand_item(prefix : String?, expand : PaymentIntents::Expand)
       expand.to_params format_expand_item(prefix, "payment_intent")
-    end
-
-    private def format_expand_item(prefix : Nil, expand : String)
-      expand
-    end
-
-    private def format_expand_item(prefix : String, expand : String)
-      "#{prefix}.#{expand}"
     end
   end
 end

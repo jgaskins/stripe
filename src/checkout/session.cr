@@ -5,17 +5,21 @@ require "./sessions"
 require "../resource"
 require "../currency"
 require "../tax_exemption"
+require "../customer"
+require "../payment_intent"
+require "../setup_intent"
+require "../subscription"
 
 struct Stripe::Checkout::Session
   include Resource
 
   getter client_reference_id : String?
   getter currency : Currency
-  getter customer : String?
+  getter customer : String | Customer | Nil
   getter customer_email : String?
   getter line_items : List(LineItem)?
   getter mode : Mode
-  getter payment_intent : String?
+  getter payment_intent : String | PaymentIntent | Nil
   getter payment_status : PaymentStatus
   getter return_url : String?
   getter status : Status
@@ -51,13 +55,13 @@ struct Stripe::Checkout::Session
   getter recovered_from : String?
   getter redirect_on_completion : RedirectOnCompletion?
   getter saved_payment_method_options : Hash(String, JSON::Any)?
-  getter setup_intent : String?
+  getter setup_intent : String | SetupIntent | Nil
   getter shipping_address_collection : JSON::Any
   getter shipping_cost : JSON::Any
   getter shipping_details : JSON::Any?
   getter shipping_options : JSON::Any?
   getter submit_type : SubmitType?
-  getter subscription : String?
+  getter subscription : String | Subscription | Nil
   getter tax_id_collection : TaxIDCollection?
   getter total_details : TotalDetails?
   getter ui_mode : UIMode?

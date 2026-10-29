@@ -1,9 +1,12 @@
 require "./resource"
 require "./currency"
+require "./customer"
 require "./list"
 require "./plan"
 require "./price"
 require "./metadata"
+require "./payment_method"
+require "./setup_intent"
 
 struct Stripe::Subscription
   include Resource
@@ -14,13 +17,13 @@ struct Stripe::Subscription
   getter current_period_end : Time
   @[JSON::Field(converter: Time::EpochConverter)]
   getter current_period_start : Time
-  getter customer : String
-  getter default_payment_method : String?
+  getter customer : String | Customer
+  getter default_payment_method : String | PaymentMethod | Nil
   getter description : String?
   getter items : List(Item)
   getter plan : Plan?
   getter latest_invoice : String?
-  getter pending_setup_intent : String?
+  getter pending_setup_intent : String | SetupIntent | Nil
   getter pending_update : JSON::Any
   getter status : Status
   @[JSON::Field(converter: Time::EpochConverter)]

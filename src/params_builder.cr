@@ -61,12 +61,12 @@ module Stripe
       self
     end
 
-    def to_s : String
+    getter to_s : String do
       @buffer.to_s
     end
 
     def to_s(io) : Nil
-      io << @buffer.to_s
+      io << to_s
     end
 
     # For adding arbitrary JSON::Serializable types (including Stripe::Resource)

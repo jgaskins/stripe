@@ -1,10 +1,11 @@
 require "./resource"
+require "./price"
 
-struct Stripe::Product
+class Stripe::Product
   include Resource
 
   getter? active : Bool
-  getter default_price : String?
+  getter default_price : String | Price | Nil
   getter description : String?
   getter name : String
   getter object : String

@@ -1,5 +1,7 @@
 require "http/client"
 
+require "./log"
+
 class Stripe::HTTPClient < HTTP::Client
   @last_request = Time.instant
 

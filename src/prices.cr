@@ -2,6 +2,7 @@ require "./api"
 require "./list"
 require "./price"
 require "./currency"
+require "./products"
 
 module Stripe
   API.define Prices do
@@ -10,13 +11,10 @@ module Stripe
       active : Bool? = nil,
       type : Price::Type? = nil,
       product : Product | String | Nil = nil,
-      expand : Expand? = nil,
+      expand : Expansions? = nil,
     ) : List(Price)
       if product.is_a? Product
         product = product.id
-      end
-      if expand
-        expand = expand.members.map(&.to_param(:data))
       end
 
       client.get "/v1/prices",
@@ -24,7 +22,7 @@ module Stripe
           active:  active,
           type:    type,
           product: product,
-          expand:  expand,
+          expand:  format_expand("data", expand),
         },
         as: List(Price)
     end
@@ -38,6 +36,7 @@ module Stripe
       billing_scheme : Price::BillingScheme,
       tiers_mode : Price::TiersMode? = nil,
       tiers : Array? = nil,
+      expand : Expansions? = nil,
       idempotency_key : String? = nil,
     )
       case product
@@ -70,6 +69,7 @@ module Stripe
               unit_amount: tier.unit_amount.try &.to_s,
             }
           },
+          expand: format_expand(nil, expand),
         },
         idempotency_key: idempotency_key,
         as: Price
@@ -79,6 +79,7 @@ module Stripe
       price : Price | String,
       *,
       active : Bool? = nil,
+      expand : Expansions? = nil,
       idempotency_key : String? = nil,
     ) : Price
       price = price.id if price.is_a? Price
@@ -86,6 +87,7 @@ module Stripe
       client.post "/v1/prices/#{price}",
         form: {
           active: active,
+          expand: format_expand(nil, expand),
         },
         idempotency_key: idempotency_key,
         as: Price
@@ -109,37 +111,19 @@ module Stripe
       end
     end
 
-    @[Flags]
-    enum Expand
+    def_expand do
       Product
       Tiers
+    end
 
-      def to_param(prefix) : String
-        if prefix
-          "#{prefix}.#{to_s}"
-        else
-          to_s
-        end
-      end
+    alias Expansions = Union(
+      Expand,
+      Array(Expand | Products::Expand),
+      Array(String),
+    )
 
-      def members
-        members = [] of self
-        each do |member|
-          members << member
-        end
-        members
-      end
-
-      def to_s
-        case self
-        when .product?
-          "product"
-        when .tiers?
-          "tiers"
-        else
-          raise "BUG: THIS SHOULD NEVER HAPPEN"
-        end
-      end
+    private def format_expand_item(prefix : String?, expand : Products::Expand)
+      expand.to_params format_expand_item(prefix, "product")
     end
   end
 end

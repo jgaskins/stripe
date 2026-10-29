@@ -5,6 +5,8 @@ require "./customer"
 require "./payment_intent"
 require "./currency"
 require "./shipping"
+require "./customers"
+require "./payment_intents"
 
 module Stripe
   API.define Charges do
@@ -17,6 +19,7 @@ module Stripe
       starting_after : String? = nil,
       ending_before : String? = nil,
       limit : Int? = nil,
+      expand : Expansions? = nil,
     ) : List(Charge)
       customer = customer.id if customer.is_a? Customer
       payment_intent = payment_intent.id if payment_intent.is_a? PaymentIntent
@@ -38,12 +41,15 @@ module Stripe
           starting_after: starting_after,
           ending_before:  ending_before,
           limit:          limit.try(&.to_s),
+          expand:         format_expand("data", expand),
         },
         as: List(Charge)
     end
 
-    def retrieve(id : String) : Charge
-      client.get "/v1/charges/#{id}", as: Charge
+    def retrieve(id : String, *, expand : Expansions? = nil) : Charge
+      client.get "/v1/charges/#{id}",
+        params: {expand: format_expand(nil, expand)},
+        as: Charge
     end
 
     # Search charges using Stripe's [search query language](https://docs.stripe.com/search#search-query-language).
@@ -51,12 +57,19 @@ module Stripe
     # ```
     # stripe.charges.search %{amount>999 AND metadata["order_id"]:"6735"}
     # ```
-    def search(query : String, *, limit : Int? = nil, page : String? = nil) : List(Charge)
+    def search(
+      query : String,
+      *,
+      limit : Int? = nil,
+      page : String? = nil,
+      expand : Expansions? = nil,
+    ) : List(Charge)
       client.get "/v1/charges/search",
         params: {
-          query: query,
-          limit: limit.try(&.to_s),
-          page:  page,
+          query:  query,
+          limit:  limit.try(&.to_s),
+          page:   page,
+          expand: format_expand("data", expand),
         },
         as: List(Charge)
     end
@@ -80,6 +93,7 @@ module Stripe
       on_behalf_of : String? = nil,
       transfer_data : Charge::TransferData? = nil,
       transfer_group : String? = nil,
+      expand : Expansions? = nil,
       idempotency_key : String? = nil,
     ) : Charge
       customer = customer.id if customer.is_a? Customer
@@ -106,6 +120,7 @@ module Stripe
             }
           },
           transfer_group: transfer_group,
+          expand:         format_expand(nil, expand),
         },
         idempotency_key: idempotency_key,
         as: Charge
@@ -121,6 +136,7 @@ module Stripe
       shipping : Shipping? = nil,
       fraud_details : Charge::FraudDetails::Report? = nil,
       transfer_group : String? = nil,
+      expand : Expansions? = nil,
       idempotency_key : String? = nil,
     ) : Charge
       charge = charge.id if charge.is_a? Charge
@@ -135,6 +151,7 @@ module Stripe
           shipping:       shipping.try(&.to_named_tuple),
           fraud_details:  fraud_details.try { |report| {user_report: report} },
           transfer_group: transfer_group,
+          expand:         format_expand(nil, expand),
         },
         idempotency_key: idempotency_key,
         as: Charge
@@ -152,6 +169,7 @@ module Stripe
       statement_descriptor_suffix : String? = nil,
       transfer_amount : Int? = nil,
       transfer_group : String? = nil,
+      expand : Expansions? = nil,
       idempotency_key : String? = nil,
     ) : Charge
       charge = charge.id if charge.is_a? Charge
@@ -165,6 +183,7 @@ module Stripe
           statement_descriptor_suffix: statement_descriptor_suffix,
           transfer_data:               {amount: transfer_amount.try(&.to_s)},
           transfer_group:              transfer_group,
+          expand:                      format_expand(nil, expand),
         },
         idempotency_key: idempotency_key,
         as: Charge
@@ -182,6 +201,20 @@ module Stripe
       # Review
       # SourceTransfer
       # Transfer
+    end
+
+    alias Expansions = Union(
+      Expand,
+      Array(Expand | Customers::Expand | PaymentIntents::Expand),
+      Array(String),
+    )
+
+    private def format_expand_item(prefix : String?, expand : Customers::Expand)
+      expand.to_params format_expand_item(prefix, "customer")
+    end
+
+    private def format_expand_item(prefix : String?, expand : PaymentIntents::Expand)
+      expand.to_params format_expand_item(prefix, "payment_intent")
     end
   end
 end

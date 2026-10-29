@@ -40,8 +40,9 @@ class Stripe::Client
       {% end %}
       as type : T.class,
     ) forall T
-      if params
-        resource = "#{path}?#{ParamsBuilder.from(params).to_s}"
+      query = ParamsBuilder.from(params).to_s if params
+      if query.presence
+        resource = "#{path}?#{query}"
       else
         resource = path
       end

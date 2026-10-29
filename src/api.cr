@@ -9,14 +9,6 @@ abstract struct Stripe::API
   macro define(name)
     struct {{name}} < ::Stripe::API
       {{yield}}
-
-      def expand(*expansions : String)
-        expansions.to_a
-      end
-
-      def expand(*expansions : Expand)
-        expansions.reduce { |acc, item| acc | item }
-      end
     end
 
     class ::Stripe::Client
@@ -44,6 +36,38 @@ abstract struct Stripe::API
         end
         params
       end
+    end
+
+    def expand(*expansions : String)
+      expansions.to_a
+    end
+
+    def expand(*expansions : Expand)
+      expansions.reduce { |acc, item| acc | item }
+    end
+
+    private def format_expand(prefix : String?, expand : Expand)
+      expand.to_params prefix
+    end
+
+    private def format_expand(prefix : String?, expand : Nil)
+      nil
+    end
+
+    private def format_expand(prefix : String?, expand : Array)
+      expand.flat_map { |item| format_expand_item prefix, item }
+    end
+
+    private def format_expand_item(prefix : String?, expand : Expand)
+      expand.to_params prefix
+    end
+
+    private def format_expand_item(prefix : Nil, expand : String)
+      expand
+    end
+
+    private def format_expand_item(prefix : String, expand : String)
+      "#{prefix}.#{expand}"
     end
   end
 
