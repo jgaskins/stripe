@@ -10,7 +10,7 @@ require "./price"
 require "./product"
 
 abstract struct Stripe::Webhook
-  include Resource
+  include JSON::Serializable
 
   DEFAULT_TOLERANCE = 5.minutes
 
@@ -86,7 +86,7 @@ abstract struct Stripe::Webhook
   end
 
   struct Request
-    include Resource
+    include JSON::Serializable
 
     getter id : String?
     getter idempotency_key : String?
@@ -275,6 +275,21 @@ abstract struct Stripe::Webhook
 
       define_event Created
       define_event Updated
+      define_event Deleted
+
+      namespace BankAccount do
+        stub_data
+        event Created
+        event Updated
+        event Deleted
+      end
+
+      namespace Card do
+        data Card
+        event Created
+        event Updated
+        event Deleted
+      end
 
       namespace Discount do
         # data Discount
@@ -464,7 +479,7 @@ abstract struct Stripe::Webhook
 
   define_enable payment_intent do
     namespace PaymentIntent do
-      stub_data
+      data PaymentIntent
       event AmountCapturableUpdated
       event Canceled
       event Created
@@ -576,6 +591,7 @@ abstract struct Stripe::Webhook
       stub_data
       event Created
       event Updated
+      event Failed
     end
   end
 
@@ -704,7 +720,7 @@ abstract struct Stripe::Webhook
   end
 
   struct Wrapper(T)
-    include Resource
+    include JSON::Serializable
 
     getter object : T
   end
@@ -713,11 +729,11 @@ abstract struct Stripe::Webhook
     {% types = [types] unless types.is_a? ArrayLiteral %}
     abstract struct Stripe::Webhook
       {% for type in types %}
-        enable_{{type.id.gsub(/\AStripe::Webhook::/, "").gsub(/:.*/, "").underscore}}
+        enable_{{type.id.gsub(/\AStripe::Webhook::/, "").gsub(/:.*/, "").gsub(/\..*/, "").underscore}}
       {% end %}
       use_json_discriminator "type", {
         {% for type in types %}
-          {{type.id.gsub(/\AStripe::Webhook::/, "").stringify.underscore.gsub(/::/, ".")}}: {{type}},
+          {{type.id.gsub(/\AStripe::Webhook::/, "").stringify.underscore.gsub(/::/, ".")}}: {{type.id.stringify.split(/\./).map(&.camelcase(lower: false).gsub(/Id/, "ID")).join("::").id}},
         {% end %}
       }
     end
